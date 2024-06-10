@@ -1,6 +1,6 @@
-Nav.AI is PDF to Screenplay Converter
+Nav.Ai
 
-This Python script converts a PDF document into a detailed screenplay using OpenAI's GPT-3.5-turbo-0125 model. The script processes the PDF in chunks, arranges the text into Acts and Scenes, and generates a formatted screenplay with dialogue, adhering to standard screenplay conventions.
+This Python script converts a PDF document into a detailed screenplay using OpenAI's GPT-3.5-turbo-0125 model. The script processes the PDF in chunks, arranges the text into Acts and Scenes, and generates a formatted screenplay with dialogue, adhering to standard screenplay conventions. The Gradio interface allows users to easily upload a PDF, input their OpenAI API key, and download the generated screenplay.
 
 Features
 
@@ -10,47 +10,79 @@ Acts and Scenes: Arranges the text into Acts and Scenes.
 Screenplay Conversion: Converts each Act into a 1000-word screenplay with dialogue.
 File Management: Saves each Act as a separate file and combines them into a final screenplay.
 Standard Screenplay Format: Ensures the final screenplay adheres to standard formatting rules.
+User Interface: Gradio interface for easy interaction and downloading of the final screenplay.
 Prerequisites
 
 Python 3.6+
 OpenAI API key
-Required Python packages: openai, PyPDF2
+Required Python packages: openai, PyPDF2, gradio
 Installation
 
-Download main.py and save it to a new folder:
+Clone the Repository:
 
-Install requriements: 
 bash
 Copy code
-pip install openai PyPDF2
+git clone https://github.com/thatlawyerfellow/Nav.Ai.git
+cd Nav.Ai
+Install the Required Packages:
+
+bash
+Copy code
+pip install openai PyPDF2 gradio
 Usage
 
-Ensure your PDF file is named a.pdf and located in the same directory as the script.
-
-Open main.py and replace "YOUR_OPENAI_API_KEY" with your actual OpenAI API key.
-
-Run the script:
+Run the Script:
 
 bash
 Copy code
-python main.py
-The script will process the PDF, generate a screenplay, and save it as output.txt.
+python pdf_to_screenplay.py
+Open the Interface:
 
-How It Works
+The script will launch a local web server and open a web browser with the Gradio interface. If it doesn't open automatically, look for the URL in the terminal output and paste it into your web browser.
+Use the Interface:
 
-Read PDF: The script reads the content of a.pdf and extracts the text.
-Split Text: The extracted text is split into chunks of 2000 words to adhere to token limits.
-Process Chunks: Each chunk is processed to create a detailed scene list and formatted into Acts and Scenes.
-Generate Screenplay: Each Act is converted into a 1000-word screenplay with dialogue, saved as separate files (act1_scene1.txt, act1_scene2.txt, etc.).
-Combine Files: All individual files are combined into a single screenplay file, output.txt.
+Enter your OpenAI API key.
+Upload the PDF file you want to convert.
+The script will process the PDF and save the final screenplay as output.txt.
+A download link for output.txt will be provided in the interface.
+Detailed Code Explanation
+
+Imports
+The script imports necessary libraries (openai, PdfReader from PyPDF2, warnings to suppress specific warnings, os, and gradio for the interface).
+
+Suppress Warnings
+Suppress specific warnings related to InsecureRequestWarning and NotOpenSSLWarning.
+
+read_pdf Function
+Reads the content of the specified PDF file and returns it as a string.
+
+split_text_into_chunks Function
+Splits the input text into chunks of 2000 words and yields each chunk.
+
+generate_prompt Function
+Generates a prompt in the format required by the OpenAI API.
+
+call_openai_api Function
+Makes a call to the OpenAI API using the generated prompt and returns the content of the API's response.
+
+convert_pdf_to_screenplay Function
+Reads the PDF.
+Processes it into chunks.
+Arranges the chunks into acts and scenes.
+Converts them into a screenplay.
+Saves each scene to a file.
+Combines all scenes into a single screenplay file.
+gradio_interface Function
+Handles user input and runs the conversion process.
+
+Gradio Interface
+Creates the Gradio interface with inputs for the API key and PDF file, and an output for the final screenplay file path.
+
 Example Output
 
-The final screenplay will be saved as output.txt in the same directory as the script. Each Act and Scene will be formatted according to standard screenplay conventions.
+The final screenplay will be saved as output.txt in the same directory as the script. Y Each Act and Scene will be formatted according to standard screenplay conventions. The download link will be provided in the Gradio interface.
 
 Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
 
-License
-
-This project is licensed under the GNU GPL
