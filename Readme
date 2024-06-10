@@ -1,0 +1,56 @@
+Nav.AI is PDF to Screenplay Converter
+
+This Python script converts a PDF document into a detailed screenplay using OpenAI's GPT-3.5-turbo-0125 model. The script processes the PDF in chunks, arranges the text into Acts and Scenes, and generates a formatted screenplay with dialogue, adhering to standard screenplay conventions.
+
+Features
+
+Read PDF: Extracts text from a PDF file.
+Chunk Processing: Splits the text into chunks of 2000 words.
+Acts and Scenes: Arranges the text into Acts and Scenes.
+Screenplay Conversion: Converts each Act into a 1000-word screenplay with dialogue.
+File Management: Saves each Act as a separate file and combines them into a final screenplay.
+Standard Screenplay Format: Ensures the final screenplay adheres to standard formatting rules.
+Prerequisites
+
+Python 3.6+
+OpenAI API key
+Required Python packages: openai, PyPDF2
+Installation
+
+Download main.py and save it to a new folder:
+
+Install requriements: 
+bash
+Copy code
+pip install openai PyPDF2
+Usage
+
+Ensure your PDF file is named a.pdf and located in the same directory as the script.
+
+Open main.py and replace "YOUR_OPENAI_API_KEY" with your actual OpenAI API key.
+
+Run the script:
+
+bash
+Copy code
+python main.py
+The script will process the PDF, generate a screenplay, and save it as output.txt.
+
+How It Works
+
+Read PDF: The script reads the content of a.pdf and extracts the text.
+Split Text: The extracted text is split into chunks of 2000 words to adhere to token limits.
+Process Chunks: Each chunk is processed to create a detailed scene list and formatted into Acts and Scenes.
+Generate Screenplay: Each Act is converted into a 1000-word screenplay with dialogue, saved as separate files (act1_scene1.txt, act1_scene2.txt, etc.).
+Combine Files: All individual files are combined into a single screenplay file, output.txt.
+Example Output
+
+The final screenplay will be saved as output.txt in the same directory as the script. Each Act and Scene will be formatted according to standard screenplay conventions.
+
+Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
+
+License
+
+This project is licensed under the GNU GPL
