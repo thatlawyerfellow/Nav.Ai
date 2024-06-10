@@ -3,13 +3,22 @@ from PyPDF2 import PdfReader
 import warnings
 from urllib3.exceptions import InsecureRequestWarning, NotOpenSSLWarning
 import os
+import gradio as gr
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=InsecureRequestWarning)
 warnings.filterwarnings("ignore", category=NotOpenSSLWarning)
 
 def read_pdf(file_path):
-    """Read text from a PDF file."""
+    """
+    Read text from a PDF file.
+    
+    Args:
+        file_path (str): Path to the PDF file.
+    
+    Returns:
+        str: Extracted text from the PDF file.
+    """
     print("Reading the PDF file...")
     pdf_text = ""
     with open(file_path, "rb") as file:
@@ -20,7 +29,16 @@ def read_pdf(file_path):
     return pdf_text
 
 def split_text_into_chunks(text, chunk_size=2000):
-    """Split text into chunks of a specified size."""
+    """
+    Split text into chunks of a specified size.
+    
+    Args:
+        text (str): The input text to be split.
+        chunk_size (int): The size of each chunk in words.
+    
+    Yields:
+        str: Chunks of text.
+    """
     print(f"Splitting text into chunks of {chunk_size} words each...")
     words = text.split()
     for i in range(0, len(words), chunk_size):
@@ -28,7 +46,16 @@ def split_text_into_chunks(text, chunk_size=2000):
     print("Finished splitting text into chunks.")
 
 def generate_prompt(system_message, user_message):
-    """Generate a prompt for the OpenAI API."""
+    """
+    Generate a prompt for the OpenAI API.
+    
+    Args:
+        system_message (str): The system message for context.
+        user_message (str): The user message containing the main instruction.
+    
+    Returns:
+        dict: The prompt formatted for the OpenAI API.
+    """
     return {
         "model": "gpt-3.5-turbo-0125",
         "messages": [
@@ -38,27 +65,41 @@ def generate_prompt(system_message, user_message):
     }
 
 def call_openai_api(prompt):
-    """Call the OpenAI API with the given prompt."""
+    """
+    Call the OpenAI API with the given prompt.
+    
+    Args:
+        prompt (dict): The prompt for the OpenAI API.
+    
+    Returns:
+        str: The response content from the OpenAI API.
+    """
     response = openai.ChatCompletion.create(
         model=prompt["model"],
         messages=prompt["messages"]
     )
     return response["choices"][0]["message"]["content"]
 
-def main():
-    # Set your OpenAI API key
-    openai.api_key = "YOUR_OPENAI_API_KEY"  # Replace with your actual OpenAI API key
-
-    # Specify the PDF file path
-    pdf_file_path = "a.pdf"
+def convert_pdf_to_screenplay(api_key, pdf_file):
+    """
+    Convert the provided PDF file into a screenplay using OpenAI API.
+    
+    Args:
+        api_key (str): OpenAI API key.
+        pdf_file (str): Path to the PDF file.
+    
+    Returns:
+        str: Path to the final screenplay file.
+    """
+    openai.api_key = api_key
 
     # Step 1: Read the PDF
-    story_text = read_pdf(pdf_file_path)
+    story_text = read_pdf(pdf_file.name)
 
     # Process the story in chunks to adhere to the token limit
     chunks = list(split_text_into_chunks(story_text))
 
-    # Initialize a variable to track act and scene numbers
+    # Initialize variables to track act and scene numbers
     act_number = 1
     scene_number = 1
 
@@ -102,9 +143,39 @@ def main():
                 with open(act_filename, "r") as act_file:
                     final_screenplay += act_file.read() + "\n\n"
 
-    with open("output.txt", "w") as file:
+    output_file = "output.txt"
+    with open(output_file, "w") as file:
         file.write(final_screenplay)
     print("Screenplay saved as output.txt")
 
+    return output_file
+
+# Gradio interface
+def gradio_interface(api_key, pdf_file):
+    """
+    Gradio interface function to handle user input and run the conversion process.
+    
+    Args:
+        api_key (str): OpenAI API key.
+        pdf_file (UploadedFile): Uploaded PDF file.
+    
+    Returns:
+        str: Download link to the final screenplay file.
+    """
+    output_file = convert_pdf_to_screenplay(api_key, pdf_file)
+    return output_file
+
+# Create the Gradio interface
+interface = gr.Interface(
+    fn=gradio_interface,
+    inputs=[
+        gr.Textbox(lines=1, placeholder="Enter your OpenAI API key", label="OpenAI API Key"),
+        gr.File(label="Upload PDF file")
+    ],
+    outputs=gr.File(label="Download Screenplay"),
+    title="PDF to Screenplay Converter",
+    description="Upload a PDF file and convert it into a screenplay using OpenAI API."
+)
+
 if __name__ == "__main__":
-    main()
+    interface.launch()
