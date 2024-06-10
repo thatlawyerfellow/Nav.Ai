@@ -16,6 +16,8 @@ Prerequisites
 Python 3.6+
 OpenAI API key
 Required Python packages: openai, PyPDF2, gradio
+
+
 Installation
 
 Clone the Repository:
@@ -24,6 +26,8 @@ bash
 Copy code
 git clone https://github.com/thatlawyerfellow/Nav.Ai.git
 cd Nav.Ai
+
+
 Install the Required Packages:
 
 bash
@@ -36,9 +40,12 @@ Run the Script:
 bash
 Copy code
 python pdf_to_screenplay.py
+
+
 Open the Interface:
 
 The script will launch a local web server and open a web browser with the Gradio interface. If it doesn't open automatically, look for the URL in the terminal output and paste it into your web browser.
+
 Use the Interface:
 
 Enter your OpenAI API key.
