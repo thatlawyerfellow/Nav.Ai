@@ -54,45 +54,42 @@ def generate_prompt(system_message, user_message):
         user_message (str): The user message containing the main instruction.
     
     Returns:
-        dict: The prompt formatted for the OpenAI API.
+        list: The prompt formatted for the OpenAI API.
     """
-    return {
-        "model": "gpt-3.5-turbo-0125",
-        "messages": [
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": user_message}
-        ]
-    }
+    return [
+        {"role": "system", "content": system_message},
+        {"role": "user", "content": user_message}
+    ]
 
-def call_openai_api(prompt):
+def call_openai_api(client, messages, model="gpt-3.5-turbo-0125"):
     """
     Call the OpenAI API with the given prompt.
     
     Args:
-        prompt (dict): The prompt for the OpenAI API.
+        client (openai.OpenAI): The OpenAI client.
+        messages (list): The messages for the OpenAI API.
+        model (str): The model to use.
     
     Returns:
         str: The response content from the OpenAI API.
     """
-    response = openai.ChatCompletion.create(
-        model=prompt["model"],
-        messages=prompt["messages"]
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages
     )
-    return response["choices"][0]["message"]["content"]
+    return response.choices[0].message.content
 
-def convert_pdf_to_screenplay(api_key, pdf_file):
+def convert_pdf_to_screenplay(client, pdf_file):
     """
     Convert the provided PDF file into a screenplay using OpenAI API.
     
     Args:
-        api_key (str): OpenAI API key.
+        client (openai.OpenAI): The OpenAI client.
         pdf_file (str): Path to the PDF file.
     
     Returns:
         str: Path to the final screenplay file.
     """
-    openai.api_key = api_key
-
     # Step 1: Read the PDF
     story_text = read_pdf(pdf_file.name)
 
@@ -110,14 +107,14 @@ def convert_pdf_to_screenplay(api_key, pdf_file):
         print(f"Processing chunk {i+1}/{len(chunks)}...")
 
         # Arrange into acts and scenes
-        user_message = f"Arrange the following story chunk into acts and scenes. Each scene should include the setting, main characters involved, and a brief summary of the action. Here’s the story chunk: {chunk}"
-        prompt = generate_prompt(system_message, user_message)
-        acts_and_scenes = call_openai_api(prompt)
+        user_message = f"Arrange the following story chunk into acts and scenes. Each scene should include the setting, main characters involved, and a brief summary of the action. Here's the story chunk: {chunk}"
+        messages = generate_prompt(system_message, user_message)
+        acts_and_scenes = call_openai_api(client, messages)
         
         # Convert each act into a 1000-word screenplay
         user_message = f"Convert the following act into a 1000-word screenplay with dialogue. Ensure it adheres to standard screenplay format. Here are the acts and scenes: {acts_and_scenes}"
-        prompt = generate_prompt(system_message, user_message)
-        formatted_scene = call_openai_api(prompt)
+        messages = generate_prompt(system_message, user_message)
+        formatted_scene = call_openai_api(client, messages)
 
         # Save each act to a separate text file
         act_filename = f"act{act_number}_scene{scene_number}.txt"
@@ -162,7 +159,8 @@ def gradio_interface(api_key, pdf_file):
     Returns:
         str: Download link to the final screenplay file.
     """
-    output_file = convert_pdf_to_screenplay(api_key, pdf_file)
+    client = openai.OpenAI(api_key=api_key)
+    output_file = convert_pdf_to_screenplay(client, pdf_file)
     return output_file
 
 # Create the Gradio interface
